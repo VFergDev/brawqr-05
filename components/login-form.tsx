@@ -24,6 +24,8 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGithubLoading, setIsGithubLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -47,6 +49,48 @@ export function LoginForm({
     }
   };
 
+  const handleGithubLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const supabase = createClient();
+    setIsGithubLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "github",
+        options: {
+          redirectTo: `${window.location.origin}/auth/oauth?next=/protected`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+      setIsGithubLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const supabase = createClient();
+    setIsGoogleLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/oauth?next=/protected`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+      setIsGoogleLoading(false);
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -57,6 +101,22 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <form onSubmit={handleGoogleLogin}>
+            <div className="flex flex-col gap-6">
+              {error && <p className="text-sm text-destructive-500">{error}</p>}
+              <Button type="submit" className="w-full" disabled={isGoogleLoading}>
+                {isLoading ? "Logging in..." : "Continue with Google"}
+              </Button>
+            </div>
+          </form>
+          <form onSubmit={handleGithubLogin}>
+            <div className="flex flex-col gap-6">
+              {error && <p className="text-sm text-destructive-500">{error}</p>}
+              <Button type="submit" className="w-full" disabled={isGithubLoading}>
+                {isLoading ? "Logging in..." : "Continue with GitHub"}
+              </Button>
+            </div>
+          </form>
           <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
