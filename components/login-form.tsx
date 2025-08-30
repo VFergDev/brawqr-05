@@ -24,7 +24,6 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGithubLoading, setIsGithubLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const router = useRouter();
 
@@ -49,26 +48,6 @@ export function LoginForm({
     }
   };
 
-  const handleGithubLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsGithubLoading(true);
-    setError(null);
-
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "github",
-        options: {
-          redirectTo: `${window.location.origin}/auth/oauth?next=/protected`,
-        },
-      });
-
-      if (error) throw error;
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-      setIsGithubLoading(false);
-    }
-  };
 
   const handleGoogleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,14 +88,7 @@ export function LoginForm({
               </Button>
             </div>
           </form>
-          <form onSubmit={handleGithubLogin}>
-            <div className="flex flex-col gap-6">
-              {error && <p className="text-sm text-destructive-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isGithubLoading}>
-                {isLoading ? "Logging in..." : "Continue with GitHub"}
-              </Button>
-            </div>
-          </form>
+          
           <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
