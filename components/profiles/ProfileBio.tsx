@@ -14,6 +14,7 @@ export default function ProfileBio({ bio }: ProfileBioProps) {
         padding: "10px",
         backgroundColor: "#f5f5f5",
         borderRadius: "5px",
+        color: "green"
       }}
     >
       <h3>About</h3>
